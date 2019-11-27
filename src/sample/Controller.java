@@ -11,6 +11,8 @@ import javafx.util.converter.IntegerStringConverter;
 
 import java.net.URL;
 import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Date;
 import java.util.ResourceBundle;
 import java.util.function.UnaryOperator;
 
@@ -71,10 +73,17 @@ public class Controller implements Initializable {
         Connection connection = SQLUtil.getConnection();
 
         if (connection != null) {
-            System.out.println("works");
+
+            System.out.println("connection works");
+            tripJournal t = new tripJournal(truck_number.getText(), driver_number.getText(), co_driver_number.getText(), java.sql.Date.valueOf(depart_date.getValue()), java.sql.Date.valueOf(return_date.getValue()), state_code.getText(), Integer.parseInt(miles_driven.getText()), fuel_receipt_number.getText(), Double.parseDouble(gallons_purchased.getText()), Double.parseDouble(taxes_paid.getText()), station_name.getText(), station_location.getText(), trip_number.getText());
+            try {
+                tripJournal.INSERT(t);
+            } catch (SQLException e) {
+                System.out.println("Insert Failed");
+            }
         }
         else {
-            System.out.println("doesn't work");
+            System.out.println("connection doesn't work");
         }
     }
 }
