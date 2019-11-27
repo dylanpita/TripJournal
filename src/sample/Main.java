@@ -14,7 +14,7 @@ public class Main extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("update.fxml"));
         Parent root = loader.load();
         primaryStage.setTitle("Truck Journal");
-        primaryStage.setScene(new Scene(root, 574, 670));
+        primaryStage.setScene(new Scene(root, 1000, 650));
         primaryStage.show();
     }
 
