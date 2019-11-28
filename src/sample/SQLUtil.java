@@ -23,7 +23,7 @@ public class SQLUtil {
         Connection connection = null;
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            String dbURL = "jdbc:mysql://localhost:3306/truck_journal";
+            String dbURL = "jdbc:mysql://localhost:3308/truck_journal";
             String username = "root";
             String password = "";
             connection = DriverManager.getConnection(
