@@ -56,6 +56,12 @@ public class Controller implements Initializable {
     @FXML
     TableView detailTable;
 
+    @FXML
+    Button search_Button;
+    @FXML
+    TextField truck_Search;
+    @FXML
+    TableView exceptionReportTable;
 
     @FXML
     Tab summaryReportTab;
@@ -78,18 +84,64 @@ public class Controller implements Initializable {
     TextFormatter<String> textFormatter = new TextFormatter<>(filter);
 
 
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         submit_Button.setOnAction(this::handleButtonAction);
         detailReportTab.setOnSelectionChanged(this::handleDetailReport);
         summaryReportTab.setOnSelectionChanged(this::handleSummaryReport);
-
+        search_Button.setOnAction(this::handleSearchAction);
         miles_driven.setTextFormatter(textFormatter);
         //gallons_purchased.setTextFormatter(textFormatter);
         //taxes_paid.setTextFormatter(textFormatter);
     }
 
+    private void handleSearchAction(ActionEvent actionEvent){
+        Connection c = SQLUtil.getConnection();
+
+        if (c != null) {
+            System.out.println("connection works");
+            data = FXCollections.observableArrayList();
+            try{
+                c = SQLUtil.getConnection();
+                //SQL FOR SELECTING ALL RECORDS THAT MATCH THE TRUCK_NUMBER ENTERED
+                String SQL = "SELECT * from trip_journal WHERE TRUCK_NUM='" + truck_Search.getText() + "'";
+                //ResultSet
+                ResultSet rs = c.createStatement().executeQuery(SQL);
+
+                for(int i=0 ; i<rs.getMetaData().getColumnCount(); i++){
+                    //We are using non property style for making dynamic table
+                    final int j = i;
+                    TableColumn col = new TableColumn(rs.getMetaData().getColumnName(i+1));
+                    col.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ObservableList,String>, ObservableValue<String>>(){
+                        public ObservableValue<String> call(TableColumn.CellDataFeatures<ObservableList, String> param) {
+                            return new SimpleStringProperty(param.getValue().get(j).toString());
+                        }
+                    });
+
+                    exceptionReportTable.getColumns().addAll(col);
+                    System.out.println("Column ["+i+"] ");
+                }
+
+                while(rs.next()){
+                    //Iterate Row
+                    ObservableList<String> row = FXCollections.observableArrayList();
+                    for(int i=1 ; i<=rs.getMetaData().getColumnCount(); i++){
+                        //Iterate Column
+                        row.add(rs.getString(i));
+                    }
+                    System.out.println("Row [1] added "+row );
+                    data.add(row);
+                }
+                //FINALLY ADDED TO TableView
+                exceptionReportTable.setItems(data);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+        else {
+            System.out.println("connection doesn't work");
+        }
+    }
     private void handleSummaryReport(Event actionEvent) {
         Connection c ;
         data = FXCollections.observableArrayList();
@@ -250,7 +302,6 @@ public class Controller implements Initializable {
             tripJournal t = new tripJournal(truck_number.getText(), driver_number.getText(), co_driver_number.getText(), java.sql.Date.valueOf(depart_date.getValue()), java.sql.Date.valueOf(return_date.getValue()), state_code.getText(), Integer.parseInt(miles_driven.getText()), fuel_receipt_number.getText(), Double.parseDouble(gallons_purchased.getText()), Double.parseDouble(taxes_paid.getText()), station_name.getText(), station_location.getText(), trip_number.getText());
             try {
                 tripJournal.INSERT(t);
-
                 truck_number.clear();
                 driver_number.clear();
                 co_driver_number.clear();
