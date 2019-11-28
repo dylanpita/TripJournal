@@ -1,6 +1,7 @@
 package sample;
 
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -77,17 +78,39 @@ public class Controller implements Initializable {
     };
     TextFormatter<String> textFormatter = new TextFormatter<>(filter);
 
-
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         submit_Button.setOnAction(this::handleButtonAction);
         detailReportTab.setOnSelectionChanged(this::handleDetailReport);
         summaryReportTab.setOnSelectionChanged(this::handleSummaryReport);
 
-        miles_driven.setTextFormatter(textFormatter);
-        //gallons_purchased.setTextFormatter(textFormatter);
-        //taxes_paid.setTextFormatter(textFormatter);
+        miles_driven.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue,
+                                String newValue) {
+                if (!newValue.matches("-?\\d+(?:\\.\\d+)?")) {
+                    miles_driven.setText(newValue.replaceAll("[^\\d]", ""));
+                }
+            }
+        });
+        gallons_purchased.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue,
+                                String newValue) {
+                if (!newValue.matches("\\d*")) {
+                    gallons_purchased.setText(newValue.replaceAll("[^\\d]", ""));
+                }
+            }
+        });
+        taxes_paid.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue,
+                                String newValue) {
+                if (!newValue.matches("\\d*")) {
+                    taxes_paid.setText(newValue.replaceAll("[^\\d]", ""));
+                }
+            }
+        });
     }
 
     private void handleSummaryReport(Event actionEvent) {
