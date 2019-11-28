@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
 
-<GridPane alignment="center" hgap="10" maxHeight="650.0" maxWidth="1000.0" minHeight="650.0" minWidth="1000.0" style="-fx-background-color: #8e9299;" vgap="10" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+<GridPane alignment="center" hgap="10" maxHeight="650.0" maxWidth="1000.0" minHeight="650.0" minWidth="1000.0" style="-fx-background-color: #8e9299;" vgap="10" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
    <columnConstraints>
       <ColumnConstraints />
    </columnConstraints>
@@ -104,6 +115,7 @@
                               <Image url="https://apply.greatcdltraining.com/images/ds-app-logo.png" />
                            </image>
                         </ImageView>
+                        <Label fx:id="errormessageTXT" alignment="TOP_LEFT" layoutX="626.0" layoutY="32.0" prefHeight="100.0" prefWidth="353.0" textFill="WHITE" wrapText="true" />
                      </children>
                      <padding>
                         <Insets left="10.0" />
@@ -134,8 +146,8 @@
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="340.0" prefWidth="342.0" style="-fx-background-color: linear-gradient(to bottom ,#1487d9, #192c8a);">
                      <children>
-                        <TextField id="truck_Search" fx:id="truck_Search" layoutX="30.0" layoutY="274.0" prefHeight="26.0" prefWidth="147.0" />
-                        <Label layoutX="52.0" layoutY="243.0" text="Truck Number" textFill="WHITE">
+                        <TextField id="truck_Search" fx:id="truck_Search" layoutX="30.0" layoutY="55.0" prefHeight="26.0" prefWidth="147.0" />
+                        <Label layoutX="63.0" layoutY="26.0" text="Truck Number" textFill="WHITE">
                            <font>
                               <Font name="System Bold" size="12.0" />
                            </font>
@@ -146,6 +158,18 @@
                            </font></Button>
                         <TableView fx:id="exceptionReportTable" layoutX="263.0" layoutY="14.0" prefHeight="554.0" prefWidth="722.0" style="-fx-background-color: linear-gradient(to bottom ,#1487d9, #192c8a); -fx-border-width: 2; -fx-border-color: WHITE;" />
                         <Separator layoutX="232.0" orientation="VERTICAL" prefHeight="581.0" prefWidth="1.0" />
+                        <Label layoutX="63.0" layoutY="109.0" text="Driver Number" textFill="WHITE">
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                        </Label>
+                        <TextField id="truck_Search" fx:id="driver_Search" layoutX="31.0" layoutY="134.0" prefHeight="26.0" prefWidth="147.0" />
+                        <Label layoutX="73.0" layoutY="193.0" text="State Code" textFill="WHITE">
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                        </Label>
+                        <TextField id="truck_Search" fx:id="state_Search" layoutX="31.0" layoutY="218.0" prefHeight="26.0" prefWidth="147.0" />
                      </children></AnchorPane>
                </content>
             </Tab>

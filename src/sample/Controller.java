@@ -1,6 +1,7 @@
 package sample;
 
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -61,6 +62,10 @@ public class Controller implements Initializable {
     @FXML
     TextField truck_Search;
     @FXML
+    TextField driver_Search;
+    @FXML
+    TextField state_Search;
+    @FXML
     TableView exceptionReportTable;
 
     @FXML
@@ -70,19 +75,10 @@ public class Controller implements Initializable {
     @FXML
     TableView totalsReportTable;
 
+    @FXML
+    Label errormessageTXT;
+
     private ObservableList<ObservableList> data;
-
-    UnaryOperator<TextFormatter.Change> filter = change -> {
-        String text = change.getText();
-
-        if (text.matches("-?\\d+(?:\\.\\d+)?")) {
-            return change;
-        }
-
-        return null;
-    };
-    TextFormatter<String> textFormatter = new TextFormatter<>(filter);
-
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -90,13 +86,68 @@ public class Controller implements Initializable {
         detailReportTab.setOnSelectionChanged(this::handleDetailReport);
         summaryReportTab.setOnSelectionChanged(this::handleSummaryReport);
         search_Button.setOnAction(this::handleSearchAction);
-        miles_driven.setTextFormatter(textFormatter);
-        //gallons_purchased.setTextFormatter(textFormatter);
-        //taxes_paid.setTextFormatter(textFormatter);
+        miles_driven.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue,
+                                String newValue) {
+                if (!newValue.matches("\\d{0,7}([\\.]\\d{0,4})?")) {
+                    miles_driven.setText(oldValue);
+                }
+            }
+        });
+        gallons_purchased.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue,
+                                String newValue) {
+                if (!newValue.matches("\\d{0,7}([\\.]\\d{0,4})?")) {
+                    gallons_purchased.setText(newValue.replaceAll("[^\\d]", ""));
+                }
+            }
+        });
+        taxes_paid.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue,
+                                String newValue) {
+                if (!newValue.matches("\\d{0,7}([\\.]\\d{0,4})?")) {
+                    taxes_paid.setText(newValue.replaceAll("[^\\d]", ""));
+                }
+            }
+        });
     }
 
     private void handleSearchAction(ActionEvent actionEvent){
         Connection c = SQLUtil.getConnection();
+
+        String SQL = "SELECT * from trip_journal";
+        int count = 0;
+
+
+        if (!truck_Search.getText().trim().equals("")) {
+            SQL += " WHERE TRUCK_NUM='" + truck_Search.getText() + "'";
+            count++;
+        }
+
+        if (!driver_Search.getText().trim().equals("")) {
+            if (count > 0) {
+                SQL += " AND DRIVER_NUM='" +driver_Search.getText()+"'";
+            }
+            else {
+                SQL += " WHERE DRIVER_NUM='" +driver_Search.getText()+"'";
+                count++;
+            }
+        }
+
+        if (!state_Search.getText().trim().equals("")) {
+            if (count > 0) {
+                SQL += " AND STATE_CODE='" +state_Search.getText()+"'";
+            }
+            else {
+                SQL += " WHERE STATE_CODE='" +state_Search.getText()+"'";
+                count++;
+            }
+        }
+
+        System.out.println(SQL);
 
         if (c != null) {
             System.out.println("connection works");
@@ -104,7 +155,7 @@ public class Controller implements Initializable {
             try{
                 c = SQLUtil.getConnection();
                 //SQL FOR SELECTING ALL RECORDS THAT MATCH THE TRUCK_NUMBER ENTERED
-                String SQL = "SELECT * from trip_journal WHERE TRUCK_NUM='" + truck_Search.getText() + "'";
+
                 //ResultSet
                 ResultSet rs = c.createStatement().executeQuery(SQL);
 
@@ -298,24 +349,70 @@ public class Controller implements Initializable {
 
         if (connection != null) {
 
-            System.out.println("connection works");
-            tripJournal t = new tripJournal(truck_number.getText(), driver_number.getText(), co_driver_number.getText(), java.sql.Date.valueOf(depart_date.getValue()), java.sql.Date.valueOf(return_date.getValue()), state_code.getText(), Integer.parseInt(miles_driven.getText()), fuel_receipt_number.getText(), Double.parseDouble(gallons_purchased.getText()), Double.parseDouble(taxes_paid.getText()), station_name.getText(), station_location.getText(), trip_number.getText());
-            try {
-                tripJournal.INSERT(t);
-                truck_number.clear();
-                driver_number.clear();
-                co_driver_number.clear();
-                depart_date.getEditor().clear();
-                return_date.getEditor().clear();
-                miles_driven.clear();
-                gallons_purchased.clear();
-                taxes_paid.clear();
-                fuel_receipt_number.clear();
-                trip_number.clear();
+            String errormessage = "Missing values: ";
+            int count = 0;
 
-            } catch (SQLException e) {
-                System.out.println("Insert Failed");
+            if (truck_number.getText().trim().equals("")) {
+                errormessage += "Truck Number, ";
+                count++;
             }
+
+            if (driver_number.getText().trim().equals("")) {
+                errormessage += "Driver Number, ";
+            }
+
+            if (driver_number.getText().trim().equals("")) {
+                errormessage += "Driver Number, ";
+            }
+            if (co_driver_number.getText().trim().equals("")) {
+                errormessage += "Co Driver Number, ";
+            }
+            if (depart_date.getValue() == null) {
+                errormessage += "Depart Date, ";
+            }
+            if (return_date.getValue() == null) {
+                errormessage += "Return Date, ";
+            }
+            if (miles_driven.getText().trim().equals("")) {
+                errormessage += "Miles Driven, ";
+            }
+            if (gallons_purchased.getText().trim().equals("")) {
+                errormessage += "Gallons Purchased, ";
+            }
+            if (taxes_paid.getText().trim().equals("")) {
+                errormessage += "Taxes Paid, ";
+            }
+            if (trip_number.getText().trim().equals("")) {
+                errormessage += "Trip Number, ";
+            }
+            if (fuel_receipt_number.getText().trim().equals("")) {
+                errormessage += "Fuel Receipt Number, ";
+            }
+
+            if (errormessage.equals("Missing values: ")) {
+                System.out.println("connection works");
+                tripJournal t = new tripJournal(truck_number.getText(), driver_number.getText(), co_driver_number.getText(), java.sql.Date.valueOf(depart_date.getValue()), java.sql.Date.valueOf(return_date.getValue()), state_code.getText(), Integer.parseInt(miles_driven.getText()), fuel_receipt_number.getText(), Double.parseDouble(gallons_purchased.getText()), Double.parseDouble(taxes_paid.getText()), station_name.getText(), station_location.getText(), trip_number.getText());
+                try {
+                    tripJournal.INSERT(t);
+                    truck_number.clear();
+                    driver_number.clear();
+                    co_driver_number.clear();
+                    depart_date.getEditor().clear();
+                    return_date.getEditor().clear();
+                    miles_driven.clear();
+                    gallons_purchased.clear();
+                    taxes_paid.clear();
+                    fuel_receipt_number.clear();
+                    trip_number.clear();
+
+                } catch (SQLException e) {
+                    System.out.println("Insert Failed");
+                }
+            }
+            else {
+                errormessageTXT.setText(errormessage);
+            }
+
         }
         else {
             System.out.println("connection doesn't work");
